@@ -5,7 +5,8 @@ import base64
 from io import BytesIO
 from PIL import Image
 import numpy as np
-import os;
+import os
+
 port = int(os.environ.get("PORT", 443))
 
 app = Flask(__name__)
@@ -41,6 +42,10 @@ def match_face_with_cloud_images(image_np, cloud_image_names):
             return True  # Nếu có khuôn mặt trong ảnh cloud, coi như hợp lệ
 
     return False
+
+@app.route('/', methods=['GET'])
+def home():
+    return "Hello, FaceScan is running!", 200
 
 @app.route('/verify', methods=['POST'])
 def verify_face():
