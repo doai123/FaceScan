@@ -1,1 +1,1 @@
-web: python main.py
+web: bash install.sh && python main.py
