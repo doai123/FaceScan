@@ -167,7 +167,7 @@ def capture_face():
 
         # Đọc ảnh từ file
         frame = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
-
+        upload = process_and_upload_face(frame)
         # Kiểm tra nếu ảnh không đọc được
         if frame is None:
             return jsonify({"message": "Invalid image file", "status": 400}), 400
