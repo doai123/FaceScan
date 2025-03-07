@@ -147,7 +147,7 @@ def compare_face():
 
     except Exception as e:
         return jsonify({"message": "Internal server error", "error": str(e), "status": 500}), 500
-
+    
 
 @app.route('/', methods= ['GET'])
 def home():
@@ -171,8 +171,7 @@ def capture_face():
         # Kiểm tra nếu ảnh không đọc được
         if frame is None:
             return jsonify({"message": "Invalid image file", "status": 400}), 400
-
-
+        return jsonify({"message": "Face captured successfully", "status": 200}), 200
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=port)
