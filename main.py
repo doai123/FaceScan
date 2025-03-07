@@ -172,13 +172,6 @@ def capture_face():
         if frame is None:
             return jsonify({"message": "Invalid image file", "status": 400}), 400
 
-        # Xử lý và upload ảnh khuôn mặt
-        uploaded_urls = process_and_upload_face(frame)
-
-        if not uploaded_urls:
-            return jsonify({"message": "No face detected", "status": 400}), 400
-
-        return jsonify({"message": "Processed and uploaded face images.", "status": 200, "uploaded_images": uploaded_urls}), 200
 
 
 if __name__ == "__main__":
