@@ -66,6 +66,7 @@ def match_face_with_cloud_images(user_image_base64, cloud_image_names):
 
 @app.route('/', methods=['GET'])
 def home():
+    print("Haar cascades directory:", cv2.data.haarcascades)  # In ra đường dẫn thư mục chứa tệp Haar cascades
     return "Hello, FaceScan is running!", 200
 
 @app.route('/verify', methods=['POST'])
