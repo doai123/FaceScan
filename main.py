@@ -69,9 +69,17 @@ def home():
     return "Hello, FaceScan is running!", 200
 @app.route('/test', methods=['GET'])
 def test():
+    # Lấy đường dẫn thư mục chứa Haar cascades
     haar_cascades_directory = cv2.data.haarcascades
-    return jsonify({"Haar cascades directory": haar_cascades_directory}), 200  # In ra đường dẫn thư mục chứa tệp Haar cascades
 
+    # Kiểm tra xem file haarcascade_frontalface_default.xml có tồn tại không
+    file_exists = os.path.isfile(os.path.join(haar_cascades_directory, "haarcascade_frontalface_default.xml"))
+
+    # Trả về đường dẫn và trạng thái của tệp
+    return jsonify({
+        "Haar cascades directory": haar_cascades_directory,
+        "haarcascade_frontalface_default.xml exists": file_exists
+    }), 200
 @app.route('/verify', methods=['POST'])
 def verify_face():
     try:
