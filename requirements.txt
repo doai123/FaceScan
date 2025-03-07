@@ -1,8 +1,7 @@
 flask
-opencv-python
+opencv-contrib-python
 numpy
 pillow
 requests
 cloudinary
 requests
-deepface
