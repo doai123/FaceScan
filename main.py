@@ -35,7 +35,9 @@ def process_and_upload_face(frame):
         # Cắt khuôn mặt
         face = frame[y:y+h, x:x+w]
         
-         # Chuyển ảnh khuôn mặt thành định dạng mà Cloudinary có thể nhận
+        # Vẽ hình chữ nhật quanh khuôn mặt
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # Chuyển ảnh khuôn mặt thành định dạng mà Cloudinary có thể nhận
         _, buffer = cv2.imencode('.jpg', face)
         face_data = BytesIO(buffer)
          # Upload ảnh lên Cloudinary
@@ -45,8 +47,6 @@ def process_and_upload_face(frame):
             folder="load/image",  # Thư mục 'load/image'
         )
         print(f"Ảnh đã được upload lên Cloudinary: {upload_result['secure_url']}")
-        # Vẽ hình chữ nhật quanh khuôn mặt
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
 
     return frame
