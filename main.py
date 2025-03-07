@@ -5,7 +5,9 @@ import cloudinary.api
 from flask import Flask, request
 import numpy as np
 from io import BytesIO
+port = int(os.environ.get("PORT", 443))
 
+app = Flask(__name__)
 
 
 # Cấu hình Cloudinary
@@ -49,10 +51,9 @@ def process_and_upload_face(frame):
     return frame
 
 
-app = Flask(__name__)
 @app.route('/', methods= ['GET'])
 def home():
-    return "Hello Ae";
+    return "Hello Ae",200
 @app.route('/capture_face', methods=['POST'])
 def capture_face():
     # Lấy ảnh từ client
@@ -66,4 +67,4 @@ def capture_face():
     return 'Processed and uploaded face images.'
 
 if __name__ == "__main__":
-    app.run(debug=True,port= 8080)
+    app.run(debug=True, host='0.0.0.0', port=port)
