@@ -25,36 +25,36 @@ cloudinary.config(
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 
-# Hàm xử lý ảnh và lưu vào Cloudinary
 def process_and_upload_face(frame):
-
-    # Chuyển ảnh sang màu xám
+    # Chuyển ảnh sang màu xám để phát hiện khuôn mặt
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-    # Phát hiện khuôn mặt trong ảnh
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
     if len(faces) == 0:
-        return {"status": 400, "message": "No face detected", "uploaded_images": []}  # Không phát hiện khuôn mặt
+        return {"status": 400, "message": "No face detected", "uploaded_images": []}
+
+    uploaded_images = []  # Danh sách lưu URL ảnh đã upload
 
     for (x, y, w, h) in faces:
-        # Cắt khuôn mặt
-        face = frame[y:y+h, x:x+w]
-        
-        # Vẽ hình chữ nhật quanh khuôn mặt
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        
+        face = frame[y:y+h, x:x+w]  # Cắt khuôn mặt
+
         # Chuyển ảnh khuôn mặt thành định dạng mà Cloudinary có thể nhận
         _, buffer = cv2.imencode('.jpg', face)
-        face_data = BytesIO(buffer)
-        
-        # Upload ảnh lên Cloudinary
-        cloudinary.uploader.upload(
-            face_data,
-            resource_type="image",
-            folder="load/image",
-        )
-        return "test"
+        face_data = BytesIO(buffer.tobytes())  # Chuyển buffer thành BytesIO
+
+        try:
+            # Upload ảnh lên Cloudinary
+            upload_result = cloudinary.uploader.upload(
+                face_data,
+                resource_type="image",
+                folder="load/image"
+            )
+            uploaded_images.append(upload_result['secure_url'])  # Lưu URL ảnh vào danh sách
+
+        except Exception as e:
+            return {"status": 500, "message": f"Upload error: {str(e)}", "uploaded_images": uploaded_images}
+
+    return {"status": 200, "message": "Success", "uploaded_images": uploaded_images}
 
 def process(frame):
 
