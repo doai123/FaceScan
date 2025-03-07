@@ -8,7 +8,6 @@ from flask import Flask, request, jsonify
 import numpy as np
 from io import BytesIO
 import requests
-from deepface import DeepFace
 
 port = int(os.environ.get("PORT", 443))
 
@@ -24,19 +23,7 @@ cloudinary.config(
 
 # Tải cascade để phát hiện khuôn mặt
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-
-# Hàm nhận diện khuôn mặt
-def detect_faces(frame):
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
-
-    face_images = []
-    for (x, y, w, h) in faces:
-        face = frame[y:y+h, x:x+w]
-        face_images.append(face)
-
-    return face_images
-
+recognizer = cv2.face.LBPHFaceRecognizer_create()
 
 # Hàm xử lý ảnh và lưu vào Cloudinary
 def process_and_upload_face(frame):
@@ -91,69 +78,80 @@ def process(frame):
         _, buffer = cv2.imencode('.jpg', face)
         face_data = BytesIO(buffer)
     return face_data
-        
+# Hàm phát hiện và trích xuất khuôn mặt
+def detect_face(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+    
+    if len(faces) == 0:
+        return None, None  # Không tìm thấy khuôn mặt
+
+    x, y, w, h = faces[0]  # Chọn khuôn mặt đầu tiên
+    face_img = gray[y:y+h, x:x+w]
+    return face_img, (x, y, w, h)
 
 
+# Tải ảnh từ Cloudinary và gán ID
+def load_faces_from_cloudinary(image_names):
+    face_samples = []
+    ids = []
+
+    for idx, image_name in enumerate(image_names):
+        image_url = f"https://res.cloudinary.com/dphfcojlc/image/upload/{image_name}.jpg"
+        response = requests.get(image_url)
+
+        if response.status_code == 200:
+            image = cv2.imdecode(np.frombuffer(response.content, np.uint8), cv2.IMREAD_COLOR)
+            face, _ = detect_face(image)
+
+            if face is not None:
+                face_samples.append(face)
+                ids.append(idx)  # Gán mỗi ảnh một ID
+
+    return face_samples, np.array(ids)
 
 
-@app.route('/', methods= ['GET'])
-def home():
-    return "Hello Ae",200
 @app.route('/compare_face', methods=['POST'])
 def compare_face():
     try:
-        # Kiểm tra xem có file ảnh không
         if 'image' not in request.files:
             return jsonify({"message": "No image file found", "status": 400}), 400
 
-        # Nhận file ảnh từ request
         file = request.files['image']
         image = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
-        image_process = process(image)
+        test_face, _ = detect_face(image)
 
-        # Kiểm tra xem có danh sách tên ảnh không
+        if test_face is None:
+            return jsonify({"message": "No face detected in uploaded image", "status": 400}), 400
+
         image_names = request.form.getlist('image_names')
         if not image_names:
             return jsonify({"message": "No image names provided", "status": 400}), 400
 
-        # Lưu ảnh tạm thời để so sánh
-        temp_image_path = "temp_uploaded.jpg"
-        cv2.imwrite(temp_image_path, image_process)
+        # Tải khuôn mặt từ Cloudinary và huấn luyện mô hình
+        faces, ids = load_faces_from_cloudinary(image_names)
 
-        matched_images = []
+        if len(faces) == 0:
+            return jsonify({"message": "No valid faces found in database", "status": 400}), 400
 
-        # So sánh với từng ảnh trong danh sách Cloudinary
-        for image_name in image_names:
-            image_url = f"https://res.cloudinary.com/dphfcojlc/image/upload/{image_name}.jpg"
+        recognizer.train(faces, ids)  # Huấn luyện mô hình
 
-            # Tải ảnh từ Cloudinary
-            response = requests.get(image_url)
-            if response.status_code != 200:
-                continue
+        # So sánh với ảnh mới
+        label, confidence = recognizer.predict(test_face)
 
-            # Đọc ảnh tải về từ Cloudinary
-            cloud_image = cv2.imdecode(np.frombuffer(response.content, np.uint8), cv2.IMREAD_COLOR)
-            temp_cloud_path = f"temp_cloud_{image_name}.jpg"
-            cv2.imwrite(temp_cloud_path, cloud_image)
-
-            # So sánh khuôn mặt bằng DeepFace
-            try:
-                result = DeepFace.verify(temp_image_path, temp_cloud_path, model_name="Facenet")
-                if result["verified"]:
-                    matched_images.append(image_name)
-            except Exception as e:
-                print(f"Error comparing {image_name}: {e}")
-
-        # Xóa ảnh tạm thời
-        os.remove(temp_image_path)
-
-        if matched_images:
-            return jsonify({"message": "Face match found", "matched_images": matched_images, "status": 200}), 200
+        if confidence < 50:  # Ngưỡng nhận diện (càng nhỏ càng chính xác)
+            matched_image = image_names[label]
+            return jsonify({"message": "Face match found", "matched_image": matched_image, "confidence": confidence, "status": 200}), 200
         else:
             return jsonify({"message": "No match found", "status": 404}), 404
 
     except Exception as e:
         return jsonify({"message": "Internal server error", "error": str(e), "status": 500}), 500
+
+
+@app.route('/', methods= ['GET'])
+def home():
+    return "Hello Ae",200
 
 @app.route('/capture_face', methods=['POST'])
 def capture_face():
