@@ -1,3 +1,4 @@
+import os
 import cv2
 import cloudinary
 import cloudinary.uploader
@@ -5,6 +6,7 @@ import cloudinary.api
 from flask import Flask, request
 import numpy as np
 from io import BytesIO
+
 port = int(os.environ.get("PORT", 443))
 
 app = Flask(__name__)
