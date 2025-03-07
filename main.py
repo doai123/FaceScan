@@ -68,7 +68,7 @@ def match_face_with_cloud_images(user_image_base64, cloud_image_names):
 def home():
     return "Hello, FaceScan is running!", 200
 @app.route('/test', methods=['GET'])
-def home():
+def test():
     haar_cascades_directory = cv2.data.haarcascades
     return jsonify({"Haar cascades directory": haar_cascades_directory}), 200  # In ra đường dẫn thư mục chứa tệp Haar cascades
 
