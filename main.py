@@ -50,7 +50,9 @@ def process_and_upload_face(frame):
 
 
 app = Flask(__name__)
-
+@app.route('/', methods= ['GET'])
+def home():
+    return "Hello Ae";
 @app.route('/capture_face', methods=['POST'])
 def capture_face():
     # Lấy ảnh từ client
