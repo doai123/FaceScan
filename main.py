@@ -69,8 +69,6 @@ def process_and_upload_face(frame):
         )
         return "test"
 
-    return {"status": 200, "message": "Processed and uploaded face images.", "uploaded_images": uploaded_urls}
-
 def process(frame):
 
     # Chuyển ảnh sang màu xám
@@ -159,7 +157,6 @@ def compare_face():
 
 @app.route('/capture_face', methods=['POST'])
 def capture_face():
-    try:
         # Kiểm tra xem có file ảnh hay không
         if 'image' not in request.files:
             return jsonify({"message": "No image file found", "status": 400}), 400
