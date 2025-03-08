@@ -37,7 +37,7 @@ def process_and_upload_face(frame):
 
     for (x, y, w, h) in faces:
         face = frame[y:y+h, x:x+w]  # Cắt khuôn mặt
-
+        
         # Chuyển ảnh khuôn mặt thành định dạng mà Cloudinary có thể nhận
         _, buffer = cv2.imencode('.jpg', face)
         face_data = BytesIO(buffer.tobytes())  # Chuyển buffer thành BytesIO
@@ -59,7 +59,7 @@ def process_and_upload_face(frame):
 
         return uploaded_images
 
-def detect_face(frame):
+def process(frame):
 
     # Chuyển ảnh sang màu xám
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -73,13 +73,27 @@ def detect_face(frame):
     for (x, y, w, h) in faces:
         # Cắt khuôn mặt
         face = frame[y:y+h, x:x+w]
+        
         # Vẽ hình chữ nhật quanh khuôn mặt
-        # cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         
         # Chuyển ảnh khuôn mặt thành định dạng mà Cloudinary có thể nhận
         _, buffer = cv2.imencode('.jpg', face)
         face_data = BytesIO(buffer)
     return face_data
+# Hàm phát hiện và trích xuất khuôn mặt
+def detect_face(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+    
+    if len(faces) == 0:
+        return None, None  # Không tìm thấy khuôn mặt
+
+    x, y, w, h = faces[0]  # Chọn khuôn mặt đầu tiên
+    face_img = gray[y:y+h, x:x+w]
+    return face_img, (x, y, w, h)
+
+
 # Tải ảnh từ Cloudinary và gán ID
 def load_faces_from_cloudinary(image_names):
     face_samples = []
@@ -108,7 +122,7 @@ def compare_face():
 
         file = request.files['image']
         image = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
-        test_face = detect_face(image)
+        test_face, _ = detect_face(image)
 
         if test_face is None:
             return jsonify({"message": "No face detected in uploaded image", "status": 400}), 400
