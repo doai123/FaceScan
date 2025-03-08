@@ -55,9 +55,9 @@ def process_and_upload_face(frame):
             })
 
         except Exception as e:
-            return {"status": 500, "message": f"Upload error: {str(e)}", "uploaded_images": uploaded_images}
+            print(e)
 
-    return {"status": 200, "message": "Success", "uploaded_images": uploaded_images}
+        return uploaded_images
 
 def process(frame):
 
@@ -174,7 +174,7 @@ def capture_face():
         # Kiểm tra nếu ảnh không đọc được
         if frame is None:
             return jsonify({"message": "Invalid image file", "status": 400}), 400
-        return jsonify({"message": "Face captured successfully", "status": 200}), 200
+        return {"status": 200, "message": "Success", "uploaded_images": upload}
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=port)
