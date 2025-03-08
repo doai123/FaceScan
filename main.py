@@ -127,12 +127,45 @@ def compare_face():
         if test_face is None:
             return jsonify({"message": "No face detected in uploaded image", "status": 400}), 400
 
-        image_names = request.form.getlist('image_names')
-        if not image_names:
-            return jsonify({"message": "No image names provided", "status": 400}), 400
+        # image_names = request.form.getlist('image_names')
+        image_list = [
+    "trt6iosfwtnwt9ky9zoa",
+    "l1lj5cqwcmyjlskpwq5h",
+    "ql6qitqljyirlomusmml",
+    "pikt6ov6l5nptgfzv0is",
+    "qkynn4dtfrfrbpelup0c",
+    "emcrglbvlrylyszxuprd",
+    "xo48r2viqubgtdpzwljh",
+    "sjdgeryw3j3gxm7nsde7",
+    "sw5hbg4j8j34nauzqrmp",
+    "hq7rhhekvl4rqjkzvvlm",
+    "qdl2bbyfphxrbxhrjxwd",
+    "hdtuxld9ysupv6zmgpfp",
+    "qeob8ceix3ah0wj4jwto",
+    "h0uhzdeaxyqkoa3ykgir",
+    "xogrlpsht34gbkenm0hi",
+    "ettzw7wrxutje8x5oj1y",
+    "sqjsvk7m6xwiqljotwas",
+    "hjxqdnv4k7ruqzcfkljl",
+    "ca4dpr6cl8oj2lodvduk",
+    "auzy1ffjig62xrottfap",
+    "ycsstzssicmz3bo4hi2i",
+    "b2xiflvjhfol1sisf52i",
+    "kyi7oh5idvmeyginmibe",
+    "gm4fahruyuj32p9zbmgj",
+    "gjo85zsj8vfeeuip8qhq",
+    "os5op37xpmxyv7hkgrin",
+    "anpbthzppaumuoc9xepq",
+    "pbvasy0eew1kciwd8yny",
+    "sndlg1tnusaz2sqpwj8i"
+]
+
+
+        # if not image_names:
+        #     return jsonify({"message": "No image names provided", "status": 400}), 400
 
         # Tải khuôn mặt từ Cloudinary và huấn luyện mô hình
-        faces, ids = load_faces_from_cloudinary(image_names)
+        faces, ids = load_faces_from_cloudinary(image_list)
 
         if len(faces) == 0:
             return jsonify({"message": "No valid faces found in database", "status": 400}), 400
@@ -143,7 +176,7 @@ def compare_face():
         label, confidence = recognizer.predict(test_face)
 
         if confidence < 50:  # Ngưỡng nhận diện (càng nhỏ càng chính xác)
-            matched_image = image_names[label]
+            matched_image = image_list[label]
             return jsonify({"message": "Face match found", "matched_image": matched_image, "confidence": confidence, "status": 200}), 200
         else:
             return jsonify({"message": "No match found", "status": 404}), 404
