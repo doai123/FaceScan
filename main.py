@@ -10,7 +10,7 @@ from io import BytesIO
 import requests
 
 port = int(os.environ.get("PORT", 443))
-
+list_Image = []
 app = Flask(__name__)
 
 
@@ -20,11 +20,9 @@ cloudinary.config(
     api_key='133562825661752',
     api_secret='f1UBV7B7jR03USGeqgeuRuXKdnI'
 )
-
 # Tải cascade để phát hiện khuôn mặt
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 recognizer = cv2.face.LBPHFaceRecognizer_create()
-
 def process_and_upload_face(frame):
     # Chuyển ảnh sang màu xám để phát hiện khuôn mặt
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -49,10 +47,11 @@ def process_and_upload_face(frame):
                 resource_type="image",
                 folder="load/image"
             )
-                 # Lưu thông tin ảnh vào danh sách
+            # Lưu thông tin ảnh vào danh sách
             uploaded_images.append({
-                "image_url": upload_result['secure_url'] 
+                "image_url": upload_result['secure_url']
             })
+            list_Image.add(upload_result['secure_url']);
 
         except Exception as e:
             print(e)
@@ -95,11 +94,11 @@ def detect_face(image):
 
 
 # Tải ảnh từ Cloudinary và gán ID
-def load_faces_from_cloudinary(image_urls):
+def load_faces_from_cloudinary():
     face_samples = []
     ids = []
 
-    for idx, image_url in enumerate(image_urls):
+    for idx, image_url in enumerate(list_Image):
         response = requests.get(image_url)
 
         if response.status_code == 200:
@@ -126,18 +125,18 @@ def compare_face():
         if test_face is None:
             return jsonify({"message": "No face detected in uploaded image", "status": 400}), 400
 
-        image_urls = request.form.getlist('image_names')
+        # image_urls = request.form.getlist('image_names')
 
 
 
 
 
 
-        if not image_urls:
-            return jsonify({"message": "No image names provided", "status": 400}), 400
+        # if not image_urls:
+            # return jsonify({"message": "No image names provided", "status": 400}), 400
 
         # Tải khuôn mặt từ Cloudinary và huấn luyện mô hình
-        faces, ids = load_faces_from_cloudinary(image_urls)
+        faces, ids = load_faces_from_cloudinary()
 
         if len(faces) == 0:
             return jsonify({"message": "No valid faces found in database", "status": 400}), 400
@@ -148,7 +147,7 @@ def compare_face():
         label, confidence = recognizer.predict(test_face)
 
         if confidence < 50:  # Ngưỡng nhận diện (càng nhỏ càng chính xác)
-            matched_image = image_urls[label]
+            matched_image = list_Image[label]
             return jsonify({"message": "Face match found", "matched_image": matched_image, "confidence": confidence, "status": 200}), 200
         else:
             return jsonify({"message": "No match found", "status": 404}), 404
