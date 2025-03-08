@@ -108,7 +108,7 @@ def compare_face():
 
         file = request.files['image']
         image = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
-        test_face, _ = detect_face(image)
+        test_face = detect_face(image)
 
         if test_face is None:
             return jsonify({"message": "No face detected in uploaded image", "status": 400}), 400
