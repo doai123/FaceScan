@@ -98,18 +98,33 @@ def load_faces_from_cloudinary():
     face_samples = []
     ids = []
 
+    print("Fetching images from:", list_Image)  # Debug danh sách ảnh
+
     for idx, image_url in enumerate(list_Image):
-        response = requests.get(image_url)
+        try:
+            response = requests.get(image_url, timeout=5)  # Thêm timeout để tránh treo
 
-        if response.status_code == 200:
+            if response.status_code != 200:
+                print(f"⚠️ Lỗi khi tải ảnh {image_url}: {response.status_code}")
+                continue  # Bỏ qua ảnh lỗi
+
             image = cv2.imdecode(np.frombuffer(response.content, np.uint8), cv2.IMREAD_COLOR)
-            face, _ = detect_face(image)
+            if image is None:
+                print(f"⚠️ Lỗi khi decode ảnh {image_url}")
+                continue  # Bỏ qua nếu decode lỗi
 
+            face, _ = detect_face(image)
             if face is not None:
                 face_samples.append(face)
-                ids.append(idx)  # Gán mỗi ảnh một ID
+                ids.append(idx)
+            else:
+                print(f"⚠️ Không phát hiện khuôn mặt trong ảnh {image_url}")
+
+        except Exception as e:
+            print(f"🚨 Lỗi khi fetch ảnh {image_url}: {e}")
 
     return face_samples, np.array(ids)
+
 
 
 @app.route('/compare_face', methods=['POST'])
@@ -133,7 +148,7 @@ def compare_face():
 
 
         # if not image_urls:
-            # return jsonify({"message": "No image names provided", "status": 400}), 400
+        # return jsonify({"message": "No image names provided", "status": 400}), 400
 
         # Tải khuôn mặt từ Cloudinary và huấn luyện mô hình
         faces, ids = load_faces_from_cloudinary()
