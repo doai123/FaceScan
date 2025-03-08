@@ -59,7 +59,7 @@ def process_and_upload_face(frame):
 
         return uploaded_images
 
-def process(frame):
+def detect_face(frame):
 
     # Chuyển ảnh sang màu xám
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -73,27 +73,13 @@ def process(frame):
     for (x, y, w, h) in faces:
         # Cắt khuôn mặt
         face = frame[y:y+h, x:x+w]
-        
         # Vẽ hình chữ nhật quanh khuôn mặt
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         
         # Chuyển ảnh khuôn mặt thành định dạng mà Cloudinary có thể nhận
         _, buffer = cv2.imencode('.jpg', face)
         face_data = BytesIO(buffer)
     return face_data
-# Hàm phát hiện và trích xuất khuôn mặt
-def detect_face(image):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
-    
-    if len(faces) == 0:
-        return None, None  # Không tìm thấy khuôn mặt
-
-    x, y, w, h = faces[0]  # Chọn khuôn mặt đầu tiên
-    face_img = gray[y:y+h, x:x+w]
-    return face_img, (x, y, w, h)
-
-
 # Tải ảnh từ Cloudinary và gán ID
 def load_faces_from_cloudinary(image_names):
     face_samples = []
@@ -127,38 +113,8 @@ def compare_face():
         if test_face is None:
             return jsonify({"message": "No face detected in uploaded image", "status": 400}), 400
 
-        # image_names = request.form.getlist('image_names')
-        image_list = [
-    "load/image/trt6iosfwtnwt9ky9zoa",
-    "load/image/l1lj5cqwcmyjlskpwq5h",
-    "load/image/ql6qitqljyirlomusmml",
-    "load/image/pikt6ov6l5nptgfzv0is",
-    "load/image/qkynn4dtfrfrbpelup0c",
-    "load/image/emcrglbvlrylyszxuprd",
-    "load/image/xo48r2viqubgtdpzwljh",
-    "load/image/sjdgeryw3j3gxm7nsde7",
-    "load/image/sw5hbg4j8j34nauzqrmp",
-    "load/image/hq7rhhekvl4rqjkzvvlm",
-    "load/image/qdl2bbyfphxrbxhrjxwd",
-    "load/image/hdtuxld9ysupv6zmgpfp",
-    "load/image/qeob8ceix3ah0wj4jwto",
-    "load/image/h0uhzdeaxyqkoa3ykgir",
-    "load/image/xogrlpsht34gbkenm0hi",
-    "load/image/ettzw7wrxutje8x5oj1y",
-    "load/image/sqjsvk7m6xwiqljotwas",
-    "load/image/hjxqdnv4k7ruqzcfkljl",
-    "load/image/ca4dpr6cl8oj2lodvduk",
-    "load/image/auzy1ffjig62xrottfap",
-    "load/image/ycsstzssicmz3bo4hi2i",
-    "load/image/b2xiflvjhfol1sisf52i",
-    "load/image/kyi7oh5idvmeyginmibe",
-    "load/image/gm4fahruyuj32p9zbmgj",
-    "load/image/gjo85zsj8vfeeuip8qhq",
-    "load/image/os5op37xpmxyv7hkgrin",
-    "load/image/anpbthzppaumuoc9xepq",
-    "load/image/pbvasy0eew1kciwd8yny",
-    "load/image/sndlg1tnusaz2sqpwj8"
-]
+        image_names = request.form.getlist('image_names')
+
 
 
 
@@ -168,7 +124,7 @@ def compare_face():
         #     return jsonify({"message": "No image names provided", "status": 400}), 400
 
         # Tải khuôn mặt từ Cloudinary và huấn luyện mô hình
-        faces, ids = load_faces_from_cloudinary(image_list)
+        faces, ids = load_faces_from_cloudinary(image_names)
 
         if len(faces) == 0:
             return jsonify({"message": "No valid faces found in database", "status": 400}), 400
@@ -179,7 +135,7 @@ def compare_face():
         label, confidence = recognizer.predict(test_face)
 
         if confidence < 50:  # Ngưỡng nhận diện (càng nhỏ càng chính xác)
-            matched_image = image_list[label]
+            matched_image = image_names[label]
             return jsonify({"message": "Face match found", "matched_image": matched_image, "confidence": confidence, "status": 200}), 200
         else:
             return jsonify({"message": "No match found", "status": 404}), 404
