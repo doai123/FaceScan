@@ -129,36 +129,39 @@ def compare_face():
 
         # image_names = request.form.getlist('image_names')
         image_list = [
-    "trt6iosfwtnwt9ky9zoa",
-    "l1lj5cqwcmyjlskpwq5h",
-    "ql6qitqljyirlomusmml",
-    "pikt6ov6l5nptgfzv0is",
-    "qkynn4dtfrfrbpelup0c",
-    "emcrglbvlrylyszxuprd",
-    "xo48r2viqubgtdpzwljh",
-    "sjdgeryw3j3gxm7nsde7",
-    "sw5hbg4j8j34nauzqrmp",
-    "hq7rhhekvl4rqjkzvvlm",
-    "qdl2bbyfphxrbxhrjxwd",
-    "hdtuxld9ysupv6zmgpfp",
-    "qeob8ceix3ah0wj4jwto",
-    "h0uhzdeaxyqkoa3ykgir",
-    "xogrlpsht34gbkenm0hi",
-    "ettzw7wrxutje8x5oj1y",
-    "sqjsvk7m6xwiqljotwas",
-    "hjxqdnv4k7ruqzcfkljl",
-    "ca4dpr6cl8oj2lodvduk",
-    "auzy1ffjig62xrottfap",
-    "ycsstzssicmz3bo4hi2i",
-    "b2xiflvjhfol1sisf52i",
-    "kyi7oh5idvmeyginmibe",
-    "gm4fahruyuj32p9zbmgj",
-    "gjo85zsj8vfeeuip8qhq",
-    "os5op37xpmxyv7hkgrin",
-    "anpbthzppaumuoc9xepq",
-    "pbvasy0eew1kciwd8yny",
-    "sndlg1tnusaz2sqpwj8i"
+    "load/image/trt6iosfwtnwt9ky9zoa",
+    "load/image/l1lj5cqwcmyjlskpwq5h",
+    "load/image/ql6qitqljyirlomusmml",
+    "load/image/pikt6ov6l5nptgfzv0is",
+    "load/image/qkynn4dtfrfrbpelup0c",
+    "load/image/emcrglbvlrylyszxuprd",
+    "load/image/xo48r2viqubgtdpzwljh",
+    "load/image/sjdgeryw3j3gxm7nsde7",
+    "load/image/sw5hbg4j8j34nauzqrmp",
+    "load/image/hq7rhhekvl4rqjkzvvlm",
+    "load/image/qdl2bbyfphxrbxhrjxwd",
+    "load/image/hdtuxld9ysupv6zmgpfp",
+    "load/image/qeob8ceix3ah0wj4jwto",
+    "load/image/h0uhzdeaxyqkoa3ykgir",
+    "load/image/xogrlpsht34gbkenm0hi",
+    "load/image/ettzw7wrxutje8x5oj1y",
+    "load/image/sqjsvk7m6xwiqljotwas",
+    "load/image/hjxqdnv4k7ruqzcfkljl",
+    "load/image/ca4dpr6cl8oj2lodvduk",
+    "load/image/auzy1ffjig62xrottfap",
+    "load/image/ycsstzssicmz3bo4hi2i",
+    "load/image/b2xiflvjhfol1sisf52i",
+    "load/image/kyi7oh5idvmeyginmibe",
+    "load/image/gm4fahruyuj32p9zbmgj",
+    "load/image/gjo85zsj8vfeeuip8qhq",
+    "load/image/os5op37xpmxyv7hkgrin",
+    "load/image/anpbthzppaumuoc9xepq",
+    "load/image/pbvasy0eew1kciwd8yny",
+    "load/image/sndlg1tnusaz2sqpwj8"
 ]
+
+
+
 
 
         # if not image_names:
