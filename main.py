@@ -100,7 +100,7 @@ def load_faces_from_cloudinary(image_names):
     ids = []
 
     for idx, image_name in enumerate(image_names):
-        image_url = f"https://res.cloudinary.com/dphfcojlc/image/upload/{image_name}.jpg"
+        image_url = f"https://res.cloudinary.com/dphfcojlc/{image_name}.jpg"
         response = requests.get(image_url)
 
         if response.status_code == 200:
