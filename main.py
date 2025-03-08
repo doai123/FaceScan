@@ -134,8 +134,8 @@ def compare_face():
 
 
 
-        # if not image_names:
-        #     return jsonify({"message": "No image names provided", "status": 400}), 400
+        if not image_names:
+            return jsonify({"message": "No image names provided", "status": 400}), 400
 
         # Tải khuôn mặt từ Cloudinary và huấn luyện mô hình
         faces, ids = load_faces_from_cloudinary(image_names)
