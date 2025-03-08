@@ -51,7 +51,7 @@ def process_and_upload_face(frame):
             )
                  # Lưu thông tin ảnh vào danh sách
             uploaded_images.append({
-                "image_name": upload_result['public_id']  # Tên ảnh do Cloudinary tạo
+                "image_url": upload_result['secure_url'] 
             })
 
         except Exception as e:
