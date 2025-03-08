@@ -49,7 +49,10 @@ def process_and_upload_face(frame):
                 resource_type="image",
                 folder="load/image"
             )
-            uploaded_images.append(upload_result['secure_url'])  # Lưu URL ảnh vào danh sách
+                 # Lưu thông tin ảnh vào danh sách
+            uploaded_images.append({
+                "image_name": upload_result['public_id']  # Tên ảnh do Cloudinary tạo
+            })
 
         except Exception as e:
             return {"status": 500, "message": f"Upload error: {str(e)}", "uploaded_images": uploaded_images}
